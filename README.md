@@ -4,7 +4,7 @@ the Raytracing series of books implemented in Zig
 
 currently following Raytracing the Next Week, output is right after finishing motion blur
 
-![Screenshot of output PPM file](./meta/out.png)
+![screenshot of output PPM file](./meta/out.png)
 
 ### features
 - multi-threaded tiled raytracing, can configure amount of cores used in main.zig
