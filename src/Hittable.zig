@@ -2,6 +2,7 @@ pub const List = @import("Hittable/List.zig");
 pub const Sphere = @import("Hittable/Sphere.zig");
 const Interval = @import("Interval.zig");
 const Material = @import("Material.zig");
+const AABB = @import("AABB.zig");
 const rtw = @import("root.zig");
 
 pub const Record = struct {
@@ -24,8 +25,13 @@ vtable: VTable,
 
 pub const VTable = struct {
     hit: *const fn (ptr: *const anyopaque, r: rtw.Ray, ray_t: rtw.Interval) ?Record,
+    boundingBox: *const fn (ptr: *const anyopaque) AABB,
 };
 
 pub fn hit(self: Hittable, r: rtw.Ray, ray_t: rtw.Interval) ?Record {
     return self.vtable.hit(@constCast(self.ptr), r, ray_t);
+}
+
+pub fn boundingBox(self: Hittable) AABB {
+    return self.vtable.boundingBox(@constCast(self.ptr));
 }

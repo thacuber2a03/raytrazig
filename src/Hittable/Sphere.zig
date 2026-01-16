@@ -1,5 +1,6 @@
 const std = @import("std");
 
+const AABB = @import("../AABB.zig");
 const Hittable = @import("../Hittable.zig");
 const Material = @import("../Material.zig");
 const rtw = @import("../root.zig");
@@ -10,27 +11,7 @@ const Sphere = @This();
 center: rtw.Ray,
 radius: rtw.Real,
 mat: Material,
-
-pub fn init(static_center: rtw.Point3, radius: rtw.Real, mat: Material) Sphere {
-    return .{
-        .center = .init(static_center, vec.zero),
-        .radius = @max(0, radius),
-        .mat = mat,
-    };
-}
-
-pub fn initMoving(
-    center1: rtw.Point3,
-    center2: rtw.Point3,
-    radius: rtw.Real,
-    mat: Material,
-) Sphere {
-    return .{
-        .center = .init(center1, center2 - center1),
-        .radius = @max(0, radius),
-        .mat = mat,
-    };
-}
+bbox: AABB,
 
 pub fn create(
     gpa: std.mem.Allocator,
@@ -85,6 +66,46 @@ fn hit(ptr: *const anyopaque, r: rtw.Ray, ray_t: rtw.Interval) ?Hittable.Record 
     return rec;
 }
 
+pub fn boundingBox(self: *const anyopaque) AABB {
+    return @as(*const Sphere, @ptrCast(@alignCast(self))).bbox;
+}
+
 pub fn hittable(self: *Sphere) Hittable {
-    return .{ .ptr = self, .vtable = .{ .hit = hit } };
+    return .{
+        .ptr = self,
+        .vtable = .{
+            .hit = hit,
+            .boundingBox = boundingBox,
+        },
+    };
+}
+
+pub fn init(static_center: rtw.Point3, radius: rtw.Real, mat: Material) Sphere {
+    const rvec: rtw.Vec3 = .{ radius, radius, radius };
+    return .{
+        .center = .init(static_center, vec.zero),
+        .radius = @max(0, radius),
+        .mat = mat,
+        .bbox = .fromPoints(static_center - rvec, static_center + rvec),
+    };
+}
+
+pub fn initMoving(
+    center1: rtw.Point3,
+    center2: rtw.Point3,
+    radius: rtw.Real,
+    mat: Material,
+) Sphere {
+    const center: rtw.Ray = .init(center1, center2 - center1);
+    const rvec: rtw.Vec3 = .{ radius, radius, radius };
+
+    return .{
+        .center = center,
+        .radius = @max(0, radius),
+        .mat = mat,
+        .bbox = .fromBoxes(
+            .fromPoints(center.at(0) - rvec, center.at(0) + rvec),
+            .fromPoints(center.at(1) - rvec, center.at(1) + rvec),
+        ),
+    };
 }

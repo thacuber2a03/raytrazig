@@ -8,6 +8,7 @@ pub const Hittable = @import("Hittable.zig");
 pub const Material = @import("Material.zig");
 pub const Interval = @import("Interval.zig");
 pub const Camera = @import("Camera.zig");
+pub const BVH = @import("BVH.zig");
 
 fn Vector3(T: type) type {
     return @Vector(3, T);

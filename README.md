@@ -6,6 +6,8 @@ currently following Raytracing the Next Week, output is right after finishing mo
 
 **NOTE:** this project was made with Zig master (0.16.0-dev).
 
+<!-- the lack of *anything* in master is annoying. I really should switch to 0.15.2... -->
+
 ![screenshot of output PPM file](./meta/out.png)
 
 ### features

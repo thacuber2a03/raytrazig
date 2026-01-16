@@ -120,8 +120,8 @@ pub fn createDemoScene(arena: std.mem.Allocator, io: std.Io) !rtw.Hittable {
                 try world.objects.append(arena, res: {
                     if (choose_mat < 0.8) {
                         const mat = try Lambertian.create(arena, vec.random(rnd) * vec.random(rnd));
-                        const center2 = center + rtw.Vec3{ 0, rtw.randomRange(rnd, 0, 0.5), 0 };
-                        break :res try Sphere.createMoving(arena, center, center2, 0.2, mat);
+                        // const center2 = center + rtw.Vec3{ 0, rtw.randomRange(rnd, 0, 0.5), 0 };
+                        break :res try Sphere.create(arena, center, 0.2, mat);
                     } else {
                         const mat = try if (choose_mat < 0.95)
                             Metal.create(arena, vec.randomRange(rnd, 0.5, 1), rtw.randomRange(rnd, 0, 0.5))
@@ -156,5 +156,6 @@ pub fn createDemoScene(arena: std.mem.Allocator, io: std.Io) !rtw.Hittable {
         try Metal.create(arena, .{ 0.7, 0.6, 0.5 }, 0),
     ));
 
-    return world.hittable();
+    world.updateBoundingBox();
+    return rtw.BVH.create(arena, rnd, world);
 }
