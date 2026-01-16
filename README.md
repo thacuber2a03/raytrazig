@@ -16,6 +16,6 @@ currently following Raytracing the Next Week, output is right after finishing te
 
 ### features
 
-- multi-threaded tiled raytracing, can configure amount of cores used in main.zig
-- can output directly to a file; no need to redirect
 - CLI to check the demos out and mess with them; no load-from-config-file yet, might do that eventually
+- multi-threaded tiled rendering, allows configuring number of cores used
+- can output directly to a file; no need to redirect

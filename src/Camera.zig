@@ -306,9 +306,5 @@ pub fn render(
 
     try file.flush();
 
-<<<<<<< HEAD
-    if (opts.output_file) |_| std.log.info("Done, check the directory", .{});
-=======
     if (opts.output_file) |_| std.log.info("done, check the current directory", .{});
->>>>>>> e66fdaf (better CLI and more demos yay)
 }
