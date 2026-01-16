@@ -1,16 +1,17 @@
 const std = @import("std");
 const sqrt = std.math.sqrt;
 
-// not a type
+pub const BVH = @import("BVH.zig");
+pub const Camera = @import("Camera.zig");
+pub const Hittable = @import("Hittable.zig");
+pub const Interval = @import("Interval.zig");
+pub const Material = @import("Material.zig");
+pub const Texture = @import("Texture.zig");
+pub const vec = @import("vec.zig");
+
 const rtw = @This();
 
-pub const Hittable = @import("Hittable.zig");
-pub const Material = @import("Material.zig");
-pub const Interval = @import("Interval.zig");
-pub const Camera = @import("Camera.zig");
-pub const BVH = @import("BVH.zig");
-
-fn Vector3(T: type) type {
+pub fn Vector3(T: type) type {
     return @Vector(3, T);
 }
 
@@ -22,8 +23,6 @@ pub const Point3 = Vec3;
 pub fn randomRange(rnd: std.Random, min: Real, max: Real) Real {
     return std.math.lerp(min, max, rnd.float(Real));
 }
-
-pub const vec = @import("vec.zig");
 
 pub const color = struct {
     fn linearToGamma(linearComponent: Real) Real {

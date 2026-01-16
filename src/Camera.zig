@@ -31,7 +31,7 @@ w: rtw.Vec3,
 defocus_disk_u: rtw.Vec3,
 defocus_disk_v: rtw.Vec3,
 
-const InitOptions = struct {
+pub const InitOptions = struct {
     aspect_ratio: rtw.Real = 1.0,
     image_width: usize = 100,
     samples_per_pixel: usize = 10,
@@ -222,10 +222,9 @@ const Worker = struct {
     }
 };
 
-pub const OutputFile = union(enum) { stdout, path: []const u8 };
-
 pub const RenderOptions = struct {
-    output_file: OutputFile = .{ .path = "out.ppm" },
+    /// If `null`, outputs to stdout.
+    output_file: ?[]const u8 = "out.ppm",
     /// If `null`, defaults to `cpu_count * 3 / 4`.
     cores_amt: ?usize = null,
 };
@@ -290,14 +289,12 @@ pub fn render(
 
     ////////////////////////////////////////////////////////////////////////////////
 
-    const output_to_file = opts.output_file == .path;
-
-    var file_handle: Io.File = if (output_to_file)
-        try Io.Dir.cwd().createFile(io, opts.output_file.path, .{})
+    var file_handle: Io.File = if (opts.output_file) |path|
+        try Io.Dir.cwd().createFile(io, path, .{})
     else
         .stdout();
 
-    defer if (output_to_file) file_handle.close(io);
+    defer if (opts.output_file) |_| file_handle.close(io);
 
     var file_buffer: [1024]u8 = undefined;
     var file_writer = file_handle.writer(io, &file_buffer);
@@ -309,5 +306,9 @@ pub fn render(
 
     try file.flush();
 
-    if (output_to_file) std.log.info("Done, check the directory", .{});
+<<<<<<< HEAD
+    if (opts.output_file) |_| std.log.info("Done, check the directory", .{});
+=======
+    if (opts.output_file) |_| std.log.info("done, check the current directory", .{});
+>>>>>>> e66fdaf (better CLI and more demos yay)
 }

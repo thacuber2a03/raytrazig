@@ -5,20 +5,12 @@ const vec = rtw.vec;
 
 const Material = @import("../Material.zig");
 const Hittable = @import("../Hittable.zig");
+const Texture = @import("../Texture.zig");
+const Color = @import("../Texture/Color.zig");
 
 const Lambertian = @This();
 
-albedo: rtw.Color,
-
-pub fn init(albedo: rtw.Color) Lambertian {
-    return .{ .albedo = albedo };
-}
-
-pub fn create(gpa: std.mem.Allocator, albedo: rtw.Color) !Material {
-    const mat = try gpa.create(Lambertian);
-    mat.* = .init(albedo);
-    return mat.material();
-}
+tex: Texture,
 
 fn scatter(
     ptr: *anyopaque,
@@ -33,9 +25,29 @@ fn scatter(
         scatter_direction = rec.normal;
 
     return .{
-        .attenuation = self.albedo,
+        .attenuation = self.tex.value(rec.u, rec.v, rec.p),
         .scattered = .initAtTime(rec.p, scatter_direction, r_in.time),
     };
+}
+
+pub fn initFromColor(gpa: std.mem.Allocator, albedo: rtw.Color) !Lambertian {
+    return .{ .tex = try Color.create(gpa, albedo) };
+}
+
+pub fn createFromColor(gpa: std.mem.Allocator, albedo: rtw.Color) !Material {
+    const mat = try gpa.create(Lambertian);
+    mat.* = try .initFromColor(gpa, albedo);
+    return mat.material();
+}
+
+pub fn init(tex: Texture) Lambertian {
+    return .{ .tex = tex };
+}
+
+pub fn create(gpa: std.mem.Allocator, tex: Texture) !Material {
+    const mat = try gpa.create(Lambertian);
+    mat.* = .init(tex);
+    return mat.material();
 }
 
 pub fn material(self: *Lambertian) Material {

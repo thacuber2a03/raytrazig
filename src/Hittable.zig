@@ -10,6 +10,8 @@ pub const Record = struct {
     normal: rtw.Point3,
     mat: Material,
     t: rtw.Real,
+    u: rtw.Real,
+    v: rtw.Real,
     front_face: bool,
 
     pub fn setFaceNormal(self: *Record, r: rtw.Ray, outward_normal: rtw.Vec3) void {
