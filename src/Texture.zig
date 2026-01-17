@@ -3,6 +3,7 @@ const rtw = @import("root.zig");
 pub const Color = @import("Texture/Color.zig");
 pub const Checker = @import("Texture/Checker.zig");
 pub const Image = @import("Texture/Image.zig");
+pub const Noise = @import("Texture/Noise.zig");
 
 const Texture = @This();
 

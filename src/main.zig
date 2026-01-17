@@ -28,7 +28,7 @@ const help_message =
     \\3 - earth
 ;
 
-const max_demo_amount = 3;
+const max_demo_amount = 4;
 
 fn helpAndStop(
     comptime fmt: []const u8,
@@ -118,13 +118,15 @@ pub fn main() !void {
         .rnd = rnd,
     };
 
-    // we abusing the init arena with this one 🗣️🔥🔥🔥🔥🔥🔥
-    try switch (demo) {
-        1 => renderBouncingBallsDemo(demo_ctx),
-        2 => renderCheckeredSpheresDemo(demo_ctx),
-        3 => renderEarthDemo(demo_ctx),
-        else => unreachable,
+    // I can *not* be fucking bothered to figure out the errors here
+    const demos = [_]*const fn (DemoContext) anyerror!void{
+        renderBouncingBallsDemo,
+        renderCheckeredSpheresDemo,
+        renderEarthDemo,
+        renderPerlinSpheresDemo,
     };
+
+    try demos[demo](demo_ctx);
 }
 
 const DemoContext = struct {
@@ -136,8 +138,9 @@ const DemoContext = struct {
 };
 
 pub fn renderBouncingBallsDemo(ctx: DemoContext) !void {
-    const arena = ctx.arena.allocator();
+    // we abusing the init arena with this one 🗣️🔥🔥🔥🔥🔥🔥
     const rnd = ctx.rnd;
+    const arena = ctx.arena.allocator();
 
     var world = try arena.create(rtw.Hittable.List);
     world.* = .init;
@@ -290,6 +293,50 @@ pub fn renderEarthDemo(ctx: DemoContext) !void {
 
             .vfov = 20,
             .lookfrom = .{ 0, 0, 12 },
+            .lookat = vec.zero,
+            .vup = .{ 0, 1, 0 },
+
+            .defocus_angle = 0,
+        },
+        .render_opts = ctx.render_opts,
+    });
+}
+
+pub fn renderPerlinSpheresDemo(ctx: DemoContext) !void {
+    const arena = ctx.arena.allocator();
+    const rnd = ctx.rnd;
+
+    var world: rtw.Hittable.List = .init;
+
+    var pertext: rtw.Texture.Noise = .init(rnd, 4);
+    var mat: Lambertian = .init(pertext.texture());
+
+    try world.objects.append(arena, try Sphere.create(
+        arena,
+        .{ 0, -1000, 0 },
+        1000,
+        mat.material(),
+    ));
+
+    try world.objects.append(arena, try Sphere.create(
+        arena,
+        .{ 0, 2, 0 },
+        2,
+        mat.material(),
+    ));
+
+    world.updateBoundingBox();
+    try render(.{
+        .gpa = ctx.gpa,
+        .world = world.hittable(),
+        .init_opts = .{
+            .aspect_ratio = 16.0 / 9.0,
+            .image_width = if (ctx.release_mode) 1200 else 400,
+            .samples_per_pixel = if (ctx.release_mode) 500 else 10,
+            .max_depth = 50,
+
+            .vfov = 20,
+            .lookfrom = .{ 13, 2, 3 },
             .lookat = vec.zero,
             .vup = .{ 0, 1, 0 },
 
